@@ -1,8 +1,42 @@
+// DİKKAT: Kendi API anahtarınızı aşağıya yapıştırabilirsiniz.
+// UYARI: Bu dosyayı GitHub'a "Public" (Herkese Açık) olarak yüklerseniz, anahtarınız çalınabilir!
+const KENDI_API_ANAHTARIM = ""; // Örnek: "AIzaSy..."
+
 document.addEventListener('DOMContentLoaded', () => {
     const chatInput = document.getElementById('chat-input');
     const sendBtn = document.getElementById('send-btn');
     const messagesContainer = document.getElementById('messages-container');
     const suggestionBtns = document.querySelectorAll('.suggestion-btn');
+
+    // API Modal Logic
+    const apiModal = document.getElementById('api-modal');
+    const settingsBtn = document.getElementById('settings-btn');
+    const closeModal = document.getElementById('close-modal');
+    const saveApiBtn = document.getElementById('save-api-key');
+    const apiKeyInput = document.getElementById('api-key-input');
+    
+    // Load saved API key
+    const savedApiKey = localStorage.getItem('nexus_api_key');
+    if (savedApiKey) {
+        apiKeyInput.value = savedApiKey;
+    }
+    
+    settingsBtn.addEventListener('click', () => {
+        apiModal.style.display = 'flex';
+    });
+    
+    closeModal.addEventListener('click', () => {
+        apiModal.style.display = 'none';
+    });
+    
+    saveApiBtn.addEventListener('click', () => {
+        const key = apiKeyInput.value.trim();
+        if (key) {
+            localStorage.setItem('nexus_api_key', key);
+            apiModal.style.display = 'none';
+            alert('API Anahtarı başarıyla kaydedildi!');
+        }
+    });
 
     // Auto-resize textarea
     chatInput.addEventListener('input', function() {
@@ -42,7 +76,7 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     });
 
-    function sendMessage() {
+    async function sendMessage() {
         const text = chatInput.value.trim();
         if (!text) return;
 
@@ -64,11 +98,41 @@ document.addEventListener('DOMContentLoaded', () => {
         // Show typing indicator
         const typingId = showTypingIndicator();
 
-        // Simulate AI response delay
-        setTimeout(() => {
+        const apiKey = KENDI_API_ANAHTARIM || localStorage.getItem('nexus_api_key');
+        
+        if (!apiKey) {
+            setTimeout(() => {
+                removeTypingIndicator(typingId);
+                addAIMessage("Sistem şu an demo modunda çalışıyor. Gerçek yanıtlar için koda API anahtarınız eklenmemiş:\n\n" + generateMockResponse(text));
+            }, 1000);
+            return;
+        }
+
+        try {
+            const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${apiKey}`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({
+                    contents: [{
+                        parts: [{ text: text }]
+                    }]
+                })
+            });
+
+            const data = await response.json();
             removeTypingIndicator(typingId);
-            addAIMessage(generateMockResponse(text));
-        }, 1500 + Math.random() * 1500);
+            
+            if (response.ok) {
+                addAIMessage(data.candidates[0].content.parts[0].text);
+            } else {
+                addAIMessage("Hata: " + (data.error?.message || "Bilinmeyen bir API hatası oluştu."));
+            }
+        } catch (error) {
+            removeTypingIndicator(typingId);
+            addAIMessage("Bağlantı hatası: " + error.message);
+        }
     }
 
     function addUserMessage(text) {
