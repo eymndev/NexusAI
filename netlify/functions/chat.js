@@ -19,7 +19,7 @@ exports.handler = async (event, context) => {
             return { statusCode: 500, body: JSON.stringify({ error: "API Key is missing in Netlify environment variables" }) };
         }
 
-        const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${API_KEY}`, {
+        const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-flash-lite-latest:generateContent?key=${API_KEY}`, {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json'
