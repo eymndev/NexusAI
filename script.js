@@ -3,6 +3,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const sendBtn = document.getElementById('send-btn');
     const messagesContainer = document.getElementById('messages-container');
     const suggestionBtns = document.querySelectorAll('.suggestion-btn');
+    const newChatBtn = document.querySelector('.new-chat-btn');
 
     const settingsBtn = document.getElementById('settings-btn');
     if(settingsBtn) {
@@ -48,6 +49,24 @@ document.addEventListener('DOMContentLoaded', () => {
             sendMessage();
         });
     });
+
+    // Handle New Chat click
+    if (newChatBtn) {
+        newChatBtn.addEventListener('click', () => {
+            const allMessages = messagesContainer.querySelectorAll('.message:not(.welcome-message)');
+            allMessages.forEach(msg => msg.remove());
+            
+            const welcomeMsg = document.querySelector('.welcome-message');
+            if (welcomeMsg) {
+                welcomeMsg.style.display = 'flex';
+            }
+            
+            chatInput.value = '';
+            chatInput.style.height = 'auto';
+            sendBtn.style.background = 'var(--text-primary)';
+            sendBtn.style.color = 'var(--bg-dark)';
+        });
+    }
 
     async function sendMessage() {
         const text = chatInput.value.trim();
