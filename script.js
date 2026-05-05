@@ -1,4 +1,56 @@
 document.addEventListener('DOMContentLoaded', () => {
+    // --- Login System ---
+    const loginOverlay = document.getElementById('login-overlay');
+    const loginBtn = document.getElementById('login-btn');
+    const loginUsernameInput = document.getElementById('login-username');
+    const loginPasswordInput = document.getElementById('login-password');
+    const loginError = document.getElementById('login-error');
+    
+    // Check Authentication
+    const authToken = localStorage.getItem('nexus_auth_token');
+    if (authToken && loginOverlay) {
+        loginOverlay.classList.add('hidden');
+    }
+
+    if (loginBtn) {
+        loginBtn.addEventListener('click', async () => {
+            const username = loginUsernameInput.value.trim();
+            const password = loginPasswordInput.value.trim();
+
+            if (!username || !password) {
+                loginError.textContent = "Lütfen tüm alanları doldurun.";
+                return;
+            }
+
+            loginBtn.textContent = "Giriş yapılıyor...";
+            loginBtn.disabled = true;
+
+            try {
+                const response = await fetch('/.netlify/functions/login', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ username, password })
+                });
+
+                const data = await response.json();
+
+                if (response.ok && data.success) {
+                    localStorage.setItem('nexus_auth_token', data.token);
+                    loginOverlay.classList.add('hidden');
+                    loginError.textContent = "";
+                } else {
+                    loginError.textContent = data.error || "Giriş başarısız.";
+                }
+            } catch (err) {
+                loginError.textContent = "Sunucuya bağlanılamadı.";
+            }
+
+            loginBtn.textContent = "Giriş Yap";
+            loginBtn.disabled = false;
+        });
+    }
+
+    // --- Chat System ---
     const chatInput = document.getElementById('chat-input');
     const sendBtn = document.getElementById('send-btn');
     const messagesContainer = document.getElementById('messages-container');
