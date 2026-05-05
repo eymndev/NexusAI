@@ -87,7 +87,13 @@ document.addEventListener('DOMContentLoaded', () => {
             if (response.ok) {
                 addAIMessage(data.reply);
             } else {
-                addAIMessage("Hata: " + (data.error || "Bilinmeyen bir sunucu hatası oluştu."));
+                let errorMsg = "Bilinmeyen bir sunucu hatası oluştu.";
+                if (data.error) {
+                    errorMsg = typeof data.error === 'string' ? data.error : (data.error.message || JSON.stringify(data.error));
+                } else if (data.message) {
+                    errorMsg = data.message;
+                }
+                addAIMessage("Hata: " + errorMsg);
             }
         } catch (error) {
             removeTypingIndicator(typingId);
