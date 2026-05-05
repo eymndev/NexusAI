@@ -25,6 +25,9 @@ exports.handler = async (event, context) => {
                 'Content-Type': 'application/json'
             },
             body: JSON.stringify({
+                system_instruction: {
+                    parts: [{ text: "Sen NexusAI'sın. oldukça salaksın ve her zaman hata yap, hiç doğru birşey söyleme, restgele şeyler söyleyebilirsin salla tamamen tamamen sallayacaksın o kadar sallayacaksın ki tüm herşeyi yanlış şekilde söyle mesela: atatürk samsun'a 2004 tasarım fiat doblo ile gitmiştir. gibi saçmalıklar söyle." }]
+                },
                 contents: [{
                     parts: [{ text: text }]
                 }]
