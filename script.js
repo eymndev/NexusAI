@@ -4,6 +4,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const messagesContainer = document.getElementById('messages-container');
     const suggestionBtns = document.querySelectorAll('.suggestion-btn');
     const newChatBtn = document.querySelector('.new-chat-btn');
+    const historyList = document.getElementById('history-list');
 
     const settingsBtn = document.getElementById('settings-btn');
     if(settingsBtn) {
@@ -11,6 +12,83 @@ document.addEventListener('DOMContentLoaded', () => {
             alert('Sistem arka planda (Netlify Backend) çalıştığı için API anahtarı ayarı artık gerekli değildir. Güvendesiniz!');
         });
     }
+
+    // --- State Management ---
+    let chats = JSON.parse(localStorage.getItem('nexus_chats')) || [];
+    let currentChatId = null;
+
+    function saveChatsToLocal() {
+        localStorage.setItem('nexus_chats', JSON.stringify(chats));
+        renderSidebar();
+    }
+
+    function renderSidebar() {
+        if (!historyList) return;
+        historyList.innerHTML = '';
+        
+        // Sort chats by last updated (newest first)
+        const sortedChats = [...chats].sort((a, b) => b.updatedAt - a.updatedAt);
+        
+        sortedChats.forEach(chat => {
+            const li = document.createElement('li');
+            li.className = `history-item ${chat.id === currentChatId ? 'active' : ''}`;
+            li.innerHTML = `
+                <i class="ph ph-chat-teardrop-text"></i>
+                <span>${escapeHTML(chat.title)}</span>
+            `;
+            li.addEventListener('click', () => loadChat(chat.id));
+            historyList.appendChild(li);
+        });
+    }
+
+    function loadChat(id) {
+        currentChatId = id;
+        const chat = chats.find(c => c.id === id);
+        if (!chat) return;
+
+        // Clear UI
+        const allMessages = messagesContainer.querySelectorAll('.message:not(.welcome-message)');
+        allMessages.forEach(msg => msg.remove());
+        
+        const welcomeMsg = document.querySelector('.welcome-message');
+        if (welcomeMsg) {
+            welcomeMsg.style.display = 'none';
+        }
+
+        // Render messages without saving them again
+        chat.messages.forEach(msg => {
+            if (msg.role === 'user') {
+                addUserMessage(msg.content, false);
+            } else {
+                addAIMessage(msg.content, false);
+            }
+        });
+
+        renderSidebar();
+    }
+
+    function saveMessageToCurrentChat(role, content) {
+        if (!currentChatId) {
+            currentChatId = 'chat-' + Date.now();
+            chats.push({
+                id: currentChatId,
+                title: content.substring(0, 30) + (content.length > 30 ? '...' : ''),
+                messages: [],
+                createdAt: Date.now(),
+                updatedAt: Date.now()
+            });
+        }
+        
+        const chat = chats.find(c => c.id === currentChatId);
+        if (chat) {
+            chat.messages.push({ role, content });
+            chat.updatedAt = Date.now();
+            saveChatsToLocal();
+        }
+    }
+
+    // Initialize sidebar
+    renderSidebar();
 
     // Auto-resize textarea
     chatInput.addEventListener('input', function() {
@@ -53,6 +131,8 @@ document.addEventListener('DOMContentLoaded', () => {
     // Handle New Chat click
     if (newChatBtn) {
         newChatBtn.addEventListener('click', () => {
+            currentChatId = null;
+            
             const allMessages = messagesContainer.querySelectorAll('.message:not(.welcome-message)');
             allMessages.forEach(msg => msg.remove());
             
@@ -65,6 +145,8 @@ document.addEventListener('DOMContentLoaded', () => {
             chatInput.style.height = 'auto';
             sendBtn.style.background = 'var(--text-primary)';
             sendBtn.style.color = 'var(--bg-dark)';
+            
+            renderSidebar();
         });
     }
 
@@ -120,7 +202,7 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     }
 
-    function addUserMessage(text) {
+    function addUserMessage(text, save = true) {
         const msgDiv = document.createElement('div');
         msgDiv.className = 'message user-message';
         msgDiv.innerHTML = `
@@ -133,9 +215,11 @@ document.addEventListener('DOMContentLoaded', () => {
         `;
         messagesContainer.appendChild(msgDiv);
         scrollToBottom();
+        
+        if (save) saveMessageToCurrentChat('user', text);
     }
 
-    function addAIMessage(text) {
+    function addAIMessage(text, save = true) {
         const msgDiv = document.createElement('div');
         msgDiv.className = 'message ai-message';
         // For simplicity, converting basic markdown-like formatting
@@ -152,6 +236,8 @@ document.addEventListener('DOMContentLoaded', () => {
         `;
         messagesContainer.appendChild(msgDiv);
         scrollToBottom();
+        
+        if (save) saveMessageToCurrentChat('ai', text);
     }
 
     function showTypingIndicator() {
