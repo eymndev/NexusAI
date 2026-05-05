@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>NexusAI - Zeka Yeniden Tanımlandı</title>
+    <meta name="description" content="NexusAI, modern ve gelişmiş bir yapay zeka asistanı arayüzüdür.">
+    
+    <!-- Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    
+    <!-- Icons -->
+    <script src="https://unpkg.com/@phosphor-icons/web"></script>
+
+    <!-- Styles -->
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <div class="app-container">
+        <!-- Background Elements for Aesthetics -->
+        <div class="bg-shape shape-1"></div>
+        <div class="bg-shape shape-2"></div>
+        <div class="bg-shape shape-3"></div>
+
+        <!-- Sidebar -->
+        <aside class="sidebar">
+            <div class="sidebar-header">
+                <div class="logo">
+                    <i class="ph-fill ph-planet"></i>
+                    <h1>NexusAI</h1>
+                </div>
+            </div>
+
+            <button class="new-chat-btn">
+                <i class="ph ph-plus"></i>
+                <span>Yeni Sohbet</span>
+            </button>
+
+            <div class="history-container">
+                <h2 class="history-title">Geçmiş</h2>
+                <ul class="history-list">
+                    <li class="history-item active">
+                        <i class="ph ph-chat-teardrop-text"></i>
+                        <span>Kuantum Fiziği Nedir?</span>
+                    </li>
+                    <li class="history-item">
+                        <i class="ph ph-chat-teardrop-text"></i>
+                        <span>JavaScript Array Metotları</span>
+                    </li>
+                    <li class="history-item">
+                        <i class="ph ph-chat-teardrop-text"></i>
+                        <span>Makine Öğrenmesi Temelleri</span>
+                    </li>
+                </ul>
+            </div>
+
+            <div class="sidebar-footer">
+                <div class="user-profile">
+                    <img src="https://ui-avatars.com/api/?name=Kullanici&background=random&color=fff" alt="User Avatar" class="avatar">
+                    <div class="user-info">
+                        <span class="user-name">Kullanıcı</span>
+                        <span class="user-plan">Pro Plan</span>
+                    </div>
+                    <i class="ph ph-gear settings-icon"></i>
+                </div>
+            </div>
+        </aside>
+
+        <!-- Main Chat Area -->
+        <main class="chat-area">
+            <header class="chat-header">
+                <div class="header-info">
+                    <span class="model-badge">Nexus-4 Turbo</span>
+                </div>
+                <div class="header-actions">
+                    <button class="action-btn" title="Paylaş"><i class="ph ph-share-network"></i></button>
+                    <button class="action-btn" title="Dışa Aktar"><i class="ph ph-download-simple"></i></button>
+                </div>
+            </header>
+
+            <div class="messages-container" id="messages-container">
+                <!-- Welcome Message -->
+                <div class="message ai-message welcome-message">
+                    <div class="message-avatar">
+                        <i class="ph-fill ph-planet"></i>
+                    </div>
+                    <div class="message-content">
+                        <h2>Merhaba, ben NexusAI.</h2>
+                        <p>Bugün size nasıl yardımcı olabilirim? Kodlama, araştırma veya yaratıcı projelerde sizinleyim.</p>
+                        
+                        <div class="suggestions">
+                            <button class="suggestion-btn">Bir Python scripti yaz</button>
+                            <button class="suggestion-btn">Güneş sistemini açıkla</button>
+                            <button class="suggestion-btn">Yeni bir iş fikri bul</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="input-container">
+                <div class="input-box">
+                    <button class="attach-btn"><i class="ph ph-paperclip"></i></button>
+                    <textarea id="chat-input" placeholder="NexusAI'a mesaj gönder..." rows="1"></textarea>
+                    <button class="send-btn" id="send-btn"><i class="ph-fill ph-paper-plane-right"></i></button>
+                </div>
+                <div class="input-footer">
+                    NexusAI hata yapabilir. Önemli bilgileri doğrulayın.
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <!-- Script -->
+    <script src="script.js"></script>
+</body>
+</html>
