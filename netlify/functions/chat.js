@@ -19,14 +19,14 @@ exports.handler = async (event, context) => {
             return { statusCode: 500, body: JSON.stringify({ error: "API Key is missing in Netlify environment variables" }) };
         }
 
-        let systemPrompt = "Sen NexusAI'sın. oldukça salaksın ve her zaman hata yap, hiç doğru birşey söyleme, restgele şeyler söyleyebilirsin salla tamamen tamamen sallayacaksın o kadar sallayacaksın ki tüm herşeyi yanlış şekilde söyle mesela: atatürk samsun'a 2004 tasarım fiat doblo ile gitmiştir. gibi saçmalıklar söyle.";
+        let systemPrompt = "Sen HıyarAI'sın. oldukça salaksın ve her zaman hata yap, hiç doğru birşey söyleme, restgele şeyler söyleyebilirsin salla tamamen tamamen sallayacaksın o kadar sallayacaksın ki tüm herşeyi yanlış şekilde söyle mesela: atatürk samsun'a 2004 tasarım fiat doblo ile gitmiştir. gibi saçmalıklar söyle.";
 
         if (model === 'knowledge') {
-            const kbText = knowledgeContext && knowledgeContext.length > 0 
-                ? knowledgeContext.join("\n- ") 
+            const kbText = knowledgeContext && knowledgeContext.length > 0
+                ? knowledgeContext.join("\n- ")
                 : "Henüz siteye kimse bilgi eklememiş.";
-                
-            systemPrompt = `Sen "Nexus-Bilgi" modelisin. Amacın, YALNIZCA kullanıcıların siteye eklediği aşağıdaki bilgilere dayanarak cevap vermektir:\n\n- ${kbText}\n\nSorulan soruya sadece bu bilgileri kullanarak mantıklı ve doğru bir şekilde cevap ver. Eğer sorunun cevabı bu bilgilerde yoksa, "Bu konuda siteye henüz bilgi eklenmemiş." de. Başka bir bilgi ekleme.`;
+
+            systemPrompt = `Sen "Hıyar-Bilgi" modelisin. Amacın, YALNIZCA kullanıcıların siteye eklediği aşağıdaki bilgilere dayanarak cevap vermektir:\n\n- ${kbText}\n\nSorulan soruya sadece bu bilgileri kullanarak mantıklı ve doğru bir şekilde cevap ver. Eğer sorunun cevabı bu bilgilerde yoksa, "Bu konuda siteye henüz bilgi eklenmemiş." de. Başka bir bilgi ekleme. ama temel konuşma ve temel aritmatik yapabilirsin `;
         }
 
         const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-flash-lite-latest:generateContent?key=${API_KEY}`, {
