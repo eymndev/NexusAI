@@ -29,7 +29,7 @@ exports.handler = async (event, context) => {
             systemPrompt = `Sen "Hıyar-Bilgi" modelisin. Amacın, YALNIZCA kullanıcıların siteye eklediği aşağıdaki bilgilere dayanarak cevap vermektir:\n\n- ${kbText}\n\nSorulan soruya sadece bu bilgileri kullanarak mantıklı ve doğru bir şekilde cevap ver. Eğer sorunun cevabı bu bilgilerde yoksa, "Bu konuda siteye henüz bilgi eklenmemiş." de. Başka bir bilgi ekleme. ama temel konuşma ve temel aritmatik yapabilirsin `;
         }
 
-        const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-flash-lite-latest:generateContent?key=${API_KEY}`, {
+        const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash-lite:generateContent?key=${API_KEY}`, {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json'
