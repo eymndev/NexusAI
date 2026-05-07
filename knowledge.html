@@ -1,0 +1,137 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>HıyarAI - Bilgi Havuzu</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <script src="https://unpkg.com/@phosphor-icons/web"></script>
+    <link rel="stylesheet" href="styles.css">
+    <style>
+        .knowledge-container {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            height: 100vh;
+            padding: 2rem;
+            z-index: 10;
+            position: relative;
+        }
+        .knowledge-card {
+            background: var(--bg-sidebar);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 16px;
+            padding: 2rem;
+            width: 100%;
+            max-width: 600px;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.3);
+            text-align: center;
+        }
+        .knowledge-card h1 {
+            margin-bottom: 1rem;
+            font-size: 2rem;
+        }
+        .knowledge-card p {
+            color: var(--text-secondary);
+            margin-bottom: 2rem;
+        }
+        .knowledge-input {
+            width: 100%;
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 12px;
+            padding: 1rem;
+            color: var(--text-primary);
+            margin-bottom: 1.5rem;
+            resize: vertical;
+            min-height: 120px;
+            outline: none;
+            font-family: inherit;
+        }
+        .knowledge-actions {
+            display: flex;
+            justify-content: space-between;
+            gap: 1rem;
+        }
+        .back-btn {
+            padding: 0.8rem 1.5rem;
+            border-radius: 8px;
+            background: transparent;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            color: var(--text-primary);
+            cursor: pointer;
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+        .save-btn {
+            padding: 0.8rem 1.5rem;
+            border-radius: 8px;
+            background: var(--gradient-brand);
+            border: none;
+            color: white;
+            cursor: pointer;
+            font-weight: 500;
+        }
+    </style>
+</head>
+<body>
+    <div class="app-container">
+        <!-- Background Elements for Aesthetics -->
+        <div class="bg-shape shape-1"></div>
+        <div class="bg-shape shape-2"></div>
+        <div class="bg-shape shape-3"></div>
+
+        <div class="knowledge-container">
+            <div class="knowledge-card">
+                <h1><i class="ph-fill ph-book-open" style="margin-right: 10px; color: #a855f7;"></i>Topluluk Bilgi Havuzu</h1>
+                <p>Buraya eklediğiniz bilgiler "Nexus-Bilgi" modeli tarafından herkes için cevap oluştururken kullanılacaktır. Herkesin faydalanması için yeni bir şeyler ekleyin!</p>
+                
+                <textarea id="knowledge-input-page" class="knowledge-input" placeholder="Örn: NexusAI'ın en sevdiği renk mavidir..."></textarea>
+                
+                <div class="knowledge-actions">
+                    <a href="index.html" class="back-btn"><i class="ph ph-arrow-left"></i> Geri Dön</a>
+                    <button id="save-knowledge-page-btn" class="save-btn">Bilgiyi Kaydet</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const saveBtn = document.getElementById('save-knowledge-page-btn');
+            const input = document.getElementById('knowledge-input-page');
+
+            saveBtn.addEventListener('click', async () => {
+                const text = input.value.trim();
+                if (!text) return;
+                
+                saveBtn.textContent = 'Kaydediliyor...';
+                saveBtn.disabled = true;
+                
+                try {
+                    const response = await fetch('/.netlify/functions/knowledge', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ text })
+                    });
+                    if(response.ok) {
+                        alert('Bilgi başarıyla eklendi! Artık Nexus-Bilgi modeli bu bilgiyi kullanabilir.');
+                        input.value = '';
+                    } else {
+                        alert('Bilgi eklenirken hata oluştu.');
+                    }
+                } catch (err) {
+                    alert('Bağlantı hatası.');
+                }
+                saveBtn.textContent = 'Bilgiyi Kaydet';
+                saveBtn.disabled = false;
+            });
+        });
+    </script>
+</body>
+</html>
