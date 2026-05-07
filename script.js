@@ -58,6 +58,49 @@ document.addEventListener('DOMContentLoaded', () => {
     const newChatBtn = document.querySelector('.new-chat-btn');
     const historyList = document.getElementById('history-list');
 
+    const modelSelect = document.getElementById('model-select');
+    const addKnowledgeBtn = document.getElementById('add-knowledge-btn');
+    const knowledgeModal = document.getElementById('knowledge-modal');
+    const closeKnowledgeModal = document.getElementById('close-knowledge-modal');
+    const saveKnowledgeBtn = document.getElementById('save-knowledge-btn');
+    const knowledgeInput = document.getElementById('knowledge-input');
+
+    if (addKnowledgeBtn && knowledgeModal) {
+        addKnowledgeBtn.addEventListener('click', () => {
+            knowledgeModal.classList.remove('hidden');
+        });
+        closeKnowledgeModal.addEventListener('click', () => {
+            knowledgeModal.classList.add('hidden');
+            knowledgeInput.value = '';
+        });
+        saveKnowledgeBtn.addEventListener('click', async () => {
+            const text = knowledgeInput.value.trim();
+            if (!text) return;
+            
+            saveKnowledgeBtn.textContent = 'Kaydediliyor...';
+            saveKnowledgeBtn.disabled = true;
+            
+            try {
+                const response = await fetch('/.netlify/functions/knowledge', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ text })
+                });
+                if(response.ok) {
+                    alert('Bilgi başarıyla eklendi! Artık Nexus-Bilgi modeli bu bilgiyi kullanabilir.');
+                    knowledgeModal.classList.add('hidden');
+                    knowledgeInput.value = '';
+                } else {
+                    alert('Bilgi eklenirken hata oluştu.');
+                }
+            } catch (err) {
+                alert('Bağlantı hatası.');
+            }
+            saveKnowledgeBtn.textContent = 'Kaydet';
+            saveKnowledgeBtn.disabled = false;
+        });
+    }
+
     const settingsBtn = document.getElementById('settings-btn');
     if(settingsBtn) {
         settingsBtn.addEventListener('click', () => {
@@ -225,13 +268,32 @@ document.addEventListener('DOMContentLoaded', () => {
         const typingId = showTypingIndicator();
 
         try {
+            const selectedModel = modelSelect ? modelSelect.value : 'default';
+            let knowledgeContext = [];
+            
+            if (selectedModel === 'knowledge') {
+                try {
+                    const kbResponse = await fetch('/.netlify/functions/knowledge');
+                    if (kbResponse.ok) {
+                        const kbData = await kbResponse.json();
+                        knowledgeContext = kbData.knowledge || [];
+                    }
+                } catch (e) {
+                    console.error("Bilgi havuzu alınamadı", e);
+                }
+            }
+
             // Netlify Functions backend'ine istek atıyoruz
             const response = await fetch('/.netlify/functions/chat', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json'
                 },
-                body: JSON.stringify({ text: text })
+                body: JSON.stringify({ 
+                    text: text,
+                    model: selectedModel,
+                    knowledgeContext: knowledgeContext
+                })
             });
 
             const data = await response.json();
